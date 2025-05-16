@@ -368,9 +368,11 @@ class BlockGameState:
         size = [len(shape.form), len(shape.form[0])]
 
         # Place the shape on the grid
+        placed_size = 0
         for i in range(size[0]):
             for j in range(size[1]):
                 if shape.form[i][j]:
+                    placed_size += 1
                     self.grid[row + i][col + j] = shape.color
 
         # Remove the used shape
@@ -399,7 +401,7 @@ class BlockGameState:
                 self.placements_without_clear = 0
 
         # Update score 
-        self.update_score(lines_cleared, all_clear)
+        self.update_score(lines_cleared, all_clear, placed_size)
 
         # Generate new shapes if all current shapes are used
         new_shapes_generated = False
@@ -452,13 +454,17 @@ class BlockGameState:
 
         return lines_cleared, all_clear
 
-    def update_score(self, lines_cleared, all_clear):
+    def update_score(self, lines_cleared, all_clear, placed_size):
         score_before = self.score
         self.combos[0] = [f"COMBO {self.combos[1]}"]
+
+        # Add placed size to score
+        self.score += placed_size
 
         if lines_cleared:
             # Calculate bonus based on combos and number of lines cleared
             bonus = lines_cleared * 10 * (self.combos[1] + 1)
+
             if lines_cleared > 2:
                 bonus *= lines_cleared - 1
 
